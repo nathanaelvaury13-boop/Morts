@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LAST TICK</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+background:black;
+overflow:hidden;
+height:100vh;
+color:white;
+}
+
+/* EFFET CRT */
+
+body::before{
+content:"";
+position:fixed;
+width:100%;
+height:100%;
+pointer-events:none;
+background:
+repeating-linear-gradient(
+0deg,
+rgba(255,255,255,0.03),
+rgba(255,255,255,0.03) 1px,
+transparent 1px,
+transparent 2px
+);
+animation:flicker 0.08s infinite;
+z-index:999;
+}
+
+@keyframes flicker{
+0%{opacity:0.9;}
+50%{opacity:1;}
+100%{opacity:0.85;}
+}
+
+/* ECRANS */
+
+.screen{
+position:absolute;
+width:100%;
+height:100%;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+padding:20px;
+text-align:center;
+}
+
+.hidden{
+display:none;
+}
+
+/* LOGO */
+
+.logo{
+animation:glitch 0.1s infinite;
+}
+
+@keyframes glitch{
+
+0%{
+transform:translate(2px,0);
+}
+
+20%{
+transform:translate(-2px,2px);
+}
+
+40%{
+transform:translate(3px,-2px);
+}
+
+60%{
+transform:translate(-3px,1px);
+}
+
+80%{
+transform:translate(1px,-1px);
+}
+
+100%{
+transform:translate(0px,0px);
+}
+
+}
+
+.logo h1{
+font-size:65px;
+letter-spacing:10px;
+text-shadow:0 0 20px red;
+color:red;
+}
+
+.logo p{
+margin-top:10px;
+color:#666;
+}
+
+button{
+margin-top:40px;
+padding:18px 40px;
+background:red;
+border:none;
+color:white;
+font-size:18px;
+cursor:pointer;
+box-shadow:0 0 30px red;
+}
+
+/* LOADING */
+
+.loading{
+font-size:24px;
+font-family:monospace;
+color:#00ff88;
+text-shadow:0 0 10px #00ff88;
+}
+
+/* PHOTO */
+
+.face{
+width:140px;
+height:140px;
+border-radius:10px;
+object-fit:cover;
+border:3px solid red;
+box-shadow:0 0 30px red;
+margin-bottom:40px;
+filter:
+grayscale(100%)
+contrast(150%);
+}
+
+/* COUNTDOWN */
+
+.countdown{
+
+display:flex;
+flex-direction:column;
+gap:35px;
+
+}
+
+.count-line{
+
+display:flex;
+align-items:flex-end;
+justify-content:center;
+gap:20px;
+
+}
+
+.big-number{
+
+font-size:110px;
+font-weight:900;
+line-height:1;
+color:white;
+text-shadow:
+0 0 10px rgba(255,255,255,0.2);
+
+}
+
+.small-text{
+
+font-size:50px;
+font-weight:800;
+margin-bottom:12px;
+
+}
+
+.glitchText{
+
+animation:glitchText 2s infinite;
+
+}
+
+@keyframes glitchText{
+
+0%{
+transform:translateX(0px);
+filter:blur(0px);
+}
+
+2%{
+transform:translateX(-3px);
+filter:blur(1px);
+}
+
+4%{
+transform:translateX(3px);
+}
+
+6%{
+transform:translateX(0px);
+filter:blur(0px);
+}
+
+100%{
+transform:translateX(0px);
+}
+
+}
+
+/* FLASH */
+
+.flash{
+position:absolute;
+width:100%;
+height:100%;
+background:white;
+opacity:0;
+pointer-events:none;
+z-index:1000;
+}
+
+.flash.active{
+animation:flashAnim 0.15s;
+}
+
+@keyframes flashAnim{
+0%{opacity:1;}
+100%{opacity:0;}
+}
+
+/* BUG TEXT */
+
+.scary{
+position:absolute;
+font-family:monospace;
+color:red;
+opacity:0.8;
+pointer-events:none;
+z-index:1001;
+}
+
+/* WARNING */
+
+.warning{
+max-width:700px;
+margin-top:25px;
+color:#666;
+line-height:1.6;
+}
+
+video,
+canvas{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="flash" id="flash"></div>
+
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas"></canvas>
+
+<!-- HOME -->
+
+<div class="screen" id="home">
+
+<div class="logo">
+
+<svg width="180" height="180" viewBox="0 0 200 200">
+
+<circle
+cx="100"
+cy="100"
+r="85"
+fill="black"
+stroke="red"
+stroke-width="6"/>
+
+<path
+d="M100 35 L115 90 L170 100 L115 110 L100 165 L85 110 L30 100 L85 90 Z"
+fill="red"/>
+
+<circle
+cx="100"
+cy="100"
+r="18"
+fill="black"/>
+
+</svg>
+
+<h1>LAST TICK</h1>
+
+<p>YOUR TIME IS RUNNING OUT</p>
+
+</div>
+
+<div class="warning">
+
+En continuant vous acceptez :
+
+<br><br>
+
+- analyse biométrique
+<br>
+- accès caméra
+<br>
+- synchronisation neuronale
+<br>
+- enregistrement appareil
+<br>
+- accès lampe
+
+</div>
+
+<button onclick="startApp()">
+ACCEPTER
+</button>
+
+</div>
+
+<!-- LOADING -->
+
+<div class="screen hidden" id="loading">
+
+<div class="loading" id="loadingText">
+INITIALISATION...
+</div>
+
+</div>
+
+<!-- RESULT -->
+
+<div class="screen hidden" id="result">
+
+<img id="faceImage" class="face">
+
+<div class="countdown" id="countdown"></div>
+
+</div>
+
+<script>
+
+document.addEventListener(
+"DOMContentLoaded",
+()=>{
+
+let stream;
+let glitchInterval;
+
+const loadingMessages = [
+
+"Connexion au serveur biométrique...",
+"Analyse neuronale...",
+"Lecture activité cardiaque...",
+"Synchronisation ADN...",
+"Récupération données médicales...",
+"Analyse comportementale...",
+"Reconnaissance faciale...",
+"Prédiction décès...",
+"Finalisation..."
+
+];
+
+function playBeep(){
+
+const ctx =
+new(window.AudioContext ||
+window.webkitAudioContext)();
+
+const osc =
+ctx.createOscillator();
+
+osc.type = "square";
+
+osc.frequency.setValueAtTime(
+Math.random()*300+80,
+ctx.currentTime
+);
+
+osc.connect(ctx.destination);
+
+osc.start();
+
+osc.stop(ctx.currentTime + 0.05);
+
+}
+
+function vibratePhone(){
+
+if(navigator.vibrate){
+
+navigator.vibrate([
+100,
+50,
+100,
+50,
+200
+]);
+
+}
+
+}
+
+function randomGlitch(){
+
+document.body.style.transform =
+`translate(
+${Math.random()*8-4}px,
+${Math.random()*8-4}px
+)`;
+
+setTimeout(()=>{
+
+document.body.style.transform =
+"translate(0px,0px)";
+
+},80);
+
+}
+
+function flashScreen(){
+
+const flash =
+document.getElementById("flash");
+
+flash.classList.add("active");
+
+setTimeout(()=>{
+
+flash.classList.remove("active");
+
+},120);
+
+}
+
+function scaryText(){
+
+const chars = [
+
+"█▓▒░",
+"DATA CORRUPTED",
+"FACE DETECTED",
+"UNKNOWN ENTITY",
+"SCANNING SOUL",
+"ERROR_0x887A",
+"LIFE EXPECTANCY FOUND"
+
+];
+
+const div =
+document.createElement("div");
+
+div.className = "scary";
+
+div.innerText =
+chars[Math.floor(
+Math.random()*chars.length
+)];
+
+div.style.left =
+Math.random()*100 + "%";
+
+div.style.top =
+Math.random()*100 + "%";
+
+div.style.fontSize =
+Math.random()*20 + 10 + "px";
+
+document.body.appendChild(div);
+
+setTimeout(()=>{
+div.remove();
+},500);
+
+}
+
+function randomDeathDate(){
+
+let saved =
+localStorage.getItem("deathDate");
+
+if(saved){
+return new Date(saved);
+}
+
+const date = new Date();
+
+const years =
+Math.floor(Math.random()*60)+1;
+
+const days =
+Math.floor(Math.random()*365);
+
+date.setFullYear(
+date.getFullYear()+years
+);
+
+date.setDate(
+date.getDate()+days
+);
+
+localStorage.setItem(
+"deathDate",
+date
+);
+
+return date;
+
+}
+
+async function activateTorch(track){
+
+try{
+
+await track.applyConstraints({
+advanced:[{torch:true}]
+});
+
+}catch(e){}
+
+}
+
+async function startApp(){
+
+document.getElementById("home")
+.classList.add("hidden");
+
+document.getElementById("loading")
+.classList.remove("hidden");
+
+stream =
+await navigator
+.mediaDevices
+.getUserMedia({
+
+video:{
+facingMode:"user"
+},
+
+audio:false
+
+});
+
+const video =
+document.getElementById("video");
+
+video.srcObject = stream;
+
+await new Promise(resolve=>{
+
+video.onloadedmetadata = ()=>{
+
+video.play();
+
+resolve();
+
+};
+
+});
+
+const track =
+stream.getVideoTracks()[0];
+
+activateTorch(track);
+
+let i = 0;
+
+glitchInterval =
+setInterval(()=>{
+
+playBeep();
+
+vibratePhone();
+
+randomGlitch();
+
+flashScreen();
+
+scaryText();
+
+},180);
+
+const interval =
+setInterval(()=>{
+
+document.getElementById(
+"loadingText"
+).innerText =
+loadingMessages[i];
+
+i++;
+
+if(i >= loadingMessages.length){
+
+clearInterval(interval);
+
+captureFace();
+
+setTimeout(()=>{
+
+showResult();
+
+},1000);
+
+}
+
+},1500);
+
+}
+
+function captureFace(){
+
+const video =
+document.getElementById("video");
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+canvas.width =
+video.videoWidth;
+
+canvas.height =
+video.videoHeight;
+
+ctx.drawImage(
+video,
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+const image =
+canvas.toDataURL("image/png");
+
+localStorage.setItem(
+"faceImage",
+image
+);
+
+}
+
+function showResult(){
+
+clearInterval(glitchInterval);
+
+document.getElementById(
+"loading"
+).classList.add("hidden");
+
+document.getElementById(
+"result"
+).classList.remove("hidden");
+
+document.getElementById(
+"faceImage"
+).src =
+localStorage.getItem(
+"faceImage"
+);
+
+const deathDate =
+randomDeathDate();
+
+updateCountdown(deathDate);
+
+setInterval(()=>{
+
+updateCountdown(deathDate);
+
+if(Math.random() > 0.85){
+
+document.querySelectorAll(
+".big-number"
+).forEach(el=>{
+
+el.style.opacity = "0.3";
+
+setTimeout(()=>{
+el.style.opacity = "1";
+},80);
+
+});
+
+}
+
+},1000);
+
+}
+
+function updateCountdown(target){
+
+const now =
+new Date().getTime();
+
+const distance =
+target - now;
+
+const years =
+Math.floor(
+distance /
+(1000*60*60*24*365)
+);
+
+const days =
+Math.floor(
+(distance %
+(1000*60*60*24*365)) /
+(1000*60*60*24)
+);
+
+const hours =
+Math.floor(
+(distance %
+(1000*60*60*24)) /
+(1000*60*60)
+);
+
+const minutes =
+Math.floor(
+(distance %
+(1000*60*60)) /
+(1000*60)
+);
+
+const seconds =
+Math.floor(
+(distance %
+(1000*60)) / 1000
+);
+
+document.getElementById(
+"countdown"
+).innerHTML =
+
+`
+
+<div class="count-line glitchText">
+
+<div class="big-number">
+${years}
+</div>
+
+<div class="small-text">
+YRS
+</div>
+
+</div>
+
+<div class="count-line glitchText">
+
+<div class="big-number">
+${days}
+</div>
+
+<div class="small-text">
+DAY
+</div>
+
+</div>
+
+<div class="count-line glitchText">
+
+<div class="big-number">
+${hours}
+</div>
+
+<div class="small-text">
+HRS
+</div>
+
+</div>
+
+<div class="count-line glitchText">
+
+<div class="big-number">
+${minutes}
+</div>
+
+<div class="small-text">
+MIN
+</div>
+
+</div>
+
+<div class="count-line glitchText">
+
+<div class="big-number">
+${seconds}
+</div>
+
+<div class="small-text">
+SEC
+</div>
+
+</div>
+
+`;
+
+}
+
+window.startApp = startApp;
+
+window.onload = ()=>{
+
+const saved =
+localStorage.getItem(
+"faceImage"
+);
+
+if(saved){
+
+document.getElementById(
+"home"
+).classList.add("hidden");
+
+showResult();
+
+}
+
+};
+
+});
+
+</script>
+
+</body>
+  </html>
