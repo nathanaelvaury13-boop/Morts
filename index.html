@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
 <title>LAST TICK</title>
 
@@ -13,6 +13,7 @@ margin:0;
 padding:0;
 box-sizing:border-box;
 font-family:Arial, Helvetica, sans-serif;
+-webkit-tap-highlight-color:transparent;
 }
 
 body{
@@ -22,7 +23,7 @@ height:100vh;
 color:white;
 }
 
-/* EFFET CRT */
+/* CRT */
 
 body::before{
 content:"";
@@ -48,7 +49,7 @@ z-index:999;
 100%{opacity:0.85;}
 }
 
-/* ECRANS */
+/* SCREENS */
 
 .screen{
 position:absolute;
@@ -60,6 +61,7 @@ align-items:center;
 flex-direction:column;
 padding:20px;
 text-align:center;
+overflow:hidden;
 }
 
 .hidden{
@@ -101,8 +103,8 @@ transform:translate(0px,0px);
 }
 
 .logo h1{
-font-size:65px;
-letter-spacing:10px;
+font-size:60px;
+letter-spacing:8px;
 text-shadow:0 0 20px red;
 color:red;
 }
@@ -111,6 +113,8 @@ color:red;
 margin-top:10px;
 color:#666;
 }
+
+/* BUTTON */
 
 button{
 margin-top:40px;
@@ -121,30 +125,110 @@ color:white;
 font-size:18px;
 cursor:pointer;
 box-shadow:0 0 30px red;
+border-radius:10px;
+}
+
+/* WARNING */
+
+.warning{
+max-width:700px;
+margin-top:25px;
+color:#666;
+line-height:1.6;
+font-size:14px;
 }
 
 /* LOADING */
 
 .loading{
-font-size:24px;
+font-size:20px;
 font-family:monospace;
 color:#00ff88;
 text-shadow:0 0 10px #00ff88;
+padding:20px;
 }
 
 /* PHOTO */
 
+.face-container{
+position:relative;
+margin-bottom:25px;
+}
+
 .face{
-width:140px;
-height:140px;
-border-radius:10px;
+
+width:110px;
+height:110px;
+
+border-radius:14px;
+
 object-fit:cover;
-border:3px solid red;
-box-shadow:0 0 30px red;
-margin-bottom:40px;
+
+border:2px solid red;
+
+box-shadow:
+0 0 20px red,
+0 0 40px rgba(255,0,0,0.4);
+
 filter:
 grayscale(100%)
-contrast(150%);
+contrast(160%);
+
+animation:
+facePulse 3s infinite;
+
+}
+
+@keyframes facePulse{
+
+0%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.04);
+}
+
+100%{
+transform:scale(1);
+}
+
+}
+
+/* SCAN LINE */
+
+.scan-line{
+
+position:absolute;
+
+left:0;
+top:0;
+
+width:110px;
+height:2px;
+
+background:red;
+
+box-shadow:0 0 10px red;
+
+animation:scan 3s infinite;
+
+}
+
+@keyframes scan{
+
+0%{
+transform:translateY(0px);
+}
+
+50%{
+transform:translateY(100px);
+}
+
+100%{
+transform:translateY(0px);
+}
+
 }
 
 /* COUNTDOWN */
@@ -153,35 +237,79 @@ contrast(150%);
 
 display:flex;
 flex-direction:column;
-gap:35px;
+
+gap:20px;
+
+width:100%;
+
+padding-bottom:50px;
 
 }
 
 .count-line{
 
 display:flex;
-align-items:flex-end;
+
 justify-content:center;
-gap:20px;
+
+align-items:flex-end;
+
+gap:12px;
+
+width:100%;
 
 }
 
 .big-number{
 
-font-size:110px;
+font-size:88px;
+
 font-weight:900;
-line-height:1;
+
+line-height:0.9;
+
 color:white;
+
 text-shadow:
-0 0 10px rgba(255,255,255,0.2);
+0 0 10px rgba(255,255,255,0.2),
+0 0 25px rgba(255,255,255,0.1);
+
+animation:
+numberGlitch 3s infinite;
+
+}
+
+@keyframes numberGlitch{
+
+0%{
+transform:translateX(0px);
+}
+
+2%{
+transform:translateX(-2px);
+}
+
+4%{
+transform:translateX(2px);
+}
+
+6%{
+transform:translateX(0px);
+}
+
+100%{
+transform:translateX(0px);
+}
 
 }
 
 .small-text{
 
-font-size:50px;
+font-size:38px;
+
 font-weight:800;
-margin-bottom:12px;
+
+margin-bottom:8px;
 
 }
 
@@ -239,7 +367,7 @@ animation:flashAnim 0.15s;
 100%{opacity:0;}
 }
 
-/* BUG TEXT */
+/* HORROR TEXT */
 
 .scary{
 position:absolute;
@@ -248,16 +376,10 @@ color:red;
 opacity:0.8;
 pointer-events:none;
 z-index:1001;
+font-weight:900;
 }
 
-/* WARNING */
-
-.warning{
-max-width:700px;
-margin-top:25px;
-color:#666;
-line-height:1.6;
-}
+/* HIDDEN */
 
 video,
 canvas{
@@ -280,7 +402,7 @@ display:none;
 
 <div class="logo">
 
-<svg width="180" height="180" viewBox="0 0 200 200">
+<svg width="170" height="170" viewBox="0 0 200 200">
 
 <circle
 cx="100"
@@ -346,7 +468,13 @@ INITIALISATION...
 
 <div class="screen hidden" id="result">
 
+<div class="face-container">
+
 <img id="faceImage" class="face">
+
+<div class="scan-line"></div>
+
+</div>
 
 <div class="countdown" id="countdown"></div>
 
@@ -440,9 +568,7 @@ document.getElementById("flash");
 flash.classList.add("active");
 
 setTimeout(()=>{
-
 flash.classList.remove("active");
-
 },120);
 
 }
@@ -456,6 +582,7 @@ const chars = [
 "FACE DETECTED",
 "UNKNOWN ENTITY",
 "SCANNING SOUL",
+"NO ESCAPE",
 "ERROR_0x887A",
 "LIFE EXPECTANCY FOUND"
 
@@ -485,6 +612,32 @@ document.body.appendChild(div);
 setTimeout(()=>{
 div.remove();
 },500);
+
+}
+
+function horrorEffects(){
+
+if(Math.random() > 0.7){
+
+flashScreen();
+
+}
+
+if(Math.random() > 0.8){
+
+navigator.vibrate([
+50,
+30,
+50
+]);
+
+}
+
+if(Math.random() > 0.9){
+
+scaryText();
+
+}
 
 }
 
@@ -611,9 +764,7 @@ clearInterval(interval);
 captureFace();
 
 setTimeout(()=>{
-
 showResult();
-
 },1000);
 
 }
@@ -684,6 +835,8 @@ updateCountdown(deathDate);
 setInterval(()=>{
 
 updateCountdown(deathDate);
+
+horrorEffects();
 
 if(Math.random() > 0.85){
 
@@ -842,4 +995,4 @@ showResult();
 </script>
 
 </body>
-  </html>
+</html>
